@@ -1,13 +1,19 @@
 const { Sequelize } = require("sequelize");
-const key=require('../key.json');
+
+require('dotenv').config();
 
 
 // Initialize Sequelize instance with hard-coded database credentials
-const sequelize = new Sequelize(key.database, key.dbuser,"key.password ", {
-  host: key.host, // or your database host
-  dialect: 'mysql', // specify your dialect
-  dialectModule: require("mysql2"),
-  port: 23589, // specify your database port
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT || "mysql",
+    dialectModule: require("mysql2"),
+    port: process.env.DB_PORT || 3306,
+
   pool: {
     max: 10, // Maximum number of connections in pool
     min: 0, // Minimum number of connections in pool
