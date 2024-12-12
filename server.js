@@ -48,7 +48,7 @@ sequelize.sync({ alter: true }).then(() => {
 //import routes
 
 const MemberRoute = require('./API/Member/memberRoute');
-const ModelRoute=require('./API/Model/modelRoute');
+const ModelRoute=require('./API/Model/ModelRoute');
 const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
