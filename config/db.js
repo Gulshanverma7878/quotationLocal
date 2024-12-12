@@ -1,12 +1,13 @@
 const { Sequelize } = require("sequelize");
+const key=require('../key.json');
+
 
 // Initialize Sequelize instance with hard-coded database credentials
-const sequelize = new Sequelize('quatetion-manageme', 'root', '', {
-  host: 'localhost', // or your database host
+const sequelize = new Sequelize(key.database, key.dbuser,"key.password ", {
+  host: key.host, // or your database host
   dialect: 'mysql', // specify your dialect
   dialectModule: require("mysql2"),
-  port: 3306, // specify your database port
-
+  port: 23589, // specify your database port
   pool: {
     max: 10, // Maximum number of connections in pool
     min: 0, // Minimum number of connections in pool
