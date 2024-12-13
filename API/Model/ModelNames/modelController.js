@@ -25,30 +25,34 @@ exports.CreateModelName = async (req, res) => {
 
       }
   
+      const insuranceDetails = req.body.insurance_details;
+      if (insuranceDetails) {
+          for (const [key, value] of Object.entries(insuranceDetails)) {
+              if (!key.startsWith('insurance') || !value) continue;
+              const index = key.match(/\d+/)?.[0];
+              const priceKey = `price${index}`;
+              const price = insuranceDetails[priceKey];
 
-      if (insurance_details) {
-        for (const [key, value] of Object.entries(insurance_details)) {
+              if (!price) continue;
+              const existingInsurance = await InsuranceModel.findOne({
+                  where: { insurance_Name: value, modelId: modelname.id }
+              });
 
-            const existIns=await InsuranceModel.findOne({where:{key}});
-            if(existIns){
-                const update=await existIns.update()
-            }
-
-
-
-            console.log(key,value)
-      const Ins=    await InsuranceModel.create({
-            insurance_Name: key,  // insurance1, insurance2, etc.
-            price: value,  // Corresponding prices for each insurance type
-            modelId:modelname.id
-          });
-          console.log(Ins);
-
-        }
+              if (existingInsurance) {
+                  await existingInsurance.update({ price });
+                  console.log(`Updated insurance: ${value} with price: ${price}`);
+              } else {
+                  await InsuranceModel.create({
+                      insurance_Name: value,
+                      price,
+                      modelId: modelname.id,
+                  });
+                  console.log(`Created new insurance: ${value} with price: ${price}`);
+              }
+          }
       }
 
-  
-      // Return the modelname response
+
       res.status(200).json(modelname);
     } catch (error) {
       // If any error, rollback the transaction

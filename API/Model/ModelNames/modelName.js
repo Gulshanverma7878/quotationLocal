@@ -95,10 +95,10 @@ Modelname.init({
     type:DataTypes.BIGINT,
     allowNull:true
   },
-  insurance:{
-    type:DataTypes.BIGINT,
-    allowNull:true
-  }
+  // insurance:{
+  //   type:DataTypes.BIGINT,
+  //   allowNull:true
+  // }
 
 },
 {

@@ -8,6 +8,7 @@ router.get('/for/:id',ModelController.getById);
 router.get('/detail/:id',ModelController.getallDetail);
 router.put('/:id',ModelController.UpdateModel);
 router.post('/excel',ModelController.excel);
+router.delete('/:id',ModelController.deleteModel);
 
 
 module.exports = router;

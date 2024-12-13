@@ -63,7 +63,7 @@ app.use('/api/quotation',QuotationRouter);
 
 
 //start server
-const port = process.env.PORT || 3000;
+const port = 3000;
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });
