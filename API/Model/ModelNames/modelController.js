@@ -14,15 +14,16 @@ exports.CreateModelName = async (req, res) => {
       const { modelName, by, VC_Code, insurance_details } = req.body;
   
       // Check if the VC_Code already exists
-      const ExistData = await ModelNames.findAll({ where: { VC_Code } });
+      const ExistData = await ModelNames.findOne({ where: { VC_Code } });
       
       let modelname;
       
-      if (ExistData.length > 0) {
+      if (ExistData) {
         modelname = await ModelNames.update(req.body, { where: { VC_Code }});
+        var statusCode=203;
       } else {
         modelname = await ModelNames.create(req.body);
-
+        var statusCode=200;
       }
   
       const insuranceDetails = req.body.insurance_details;
@@ -34,8 +35,10 @@ exports.CreateModelName = async (req, res) => {
               const price = insuranceDetails[priceKey];
 
               if (!price) continue;
+              const dataId = ExistData ? ExistData.id : modelname.id;
+              
               const existingInsurance = await InsuranceModel.findOne({
-                  where: { insurance_Name: value, modelId: modelname.id }
+                  where: { insurance_Name: value, modelId: dataId }
               });
 
               if (existingInsurance) {
@@ -53,7 +56,7 @@ exports.CreateModelName = async (req, res) => {
       }
 
 
-      res.status(200).json(modelname);
+      res.status(statusCode).json(modelname);
     } catch (error) {
       // If any error, rollback the transaction
       console.error('Error creating model name:', error);
