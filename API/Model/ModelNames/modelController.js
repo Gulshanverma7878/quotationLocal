@@ -8,8 +8,6 @@ const xlsx = require('xlsx');
 
 
 exports.CreateModelName = async (req, res) => {
-   
-  
     try {
       const { modelName, by, VC_Code, insurance_details } = req.body;
   
@@ -68,8 +66,16 @@ exports.CreateModelName = async (req, res) => {
 exports.getAllModelNames = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
+        console.log((page - 1) * limit);
         const offset = (page - 1) * limit;
         const modelNames = await ModelNames.findAndCountAll({
+            include:[
+                {model:AccessoriesModel,as:'accessories',attributes:['id','AccessoryName','price']},
+                {model:InsuranceModel,as:'insurances',attributes:['id','insurance_Name','price']},
+                {model:VariantModel,as:'variants',attributes:['id','variant','price']},
+                {model:ColorModel,as:'colors',attributes:['id','color','price']},
+                {model:VASModel,as:'vas',attributes:['id','VAS_Name','price']}
+            ],
             limit,
             offset,
         });
