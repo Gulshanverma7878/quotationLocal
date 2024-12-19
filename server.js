@@ -52,6 +52,9 @@ const ModelRoute=require('./API/Model/ModelRoute');
 const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
+app.get('/', (req, res) => {
+    res.send('update pagination');
+})
 
 
 

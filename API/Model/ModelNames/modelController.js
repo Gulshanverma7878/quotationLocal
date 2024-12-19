@@ -63,34 +63,46 @@ exports.CreateModelName = async (req, res) => {
   };
   
 
-exports.getAllModelNames = async (req, res) => {
+  exports.getAllModelNames = async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
-        console.log((page - 1) * limit);
-        const offset = (page - 1) * limit;
-        const modelNames = await ModelNames.findAndCountAll({
-            include:[
-                {model:AccessoriesModel,as:'accessories',attributes:['id','AccessoryName','price']},
-                {model:InsuranceModel,as:'insurances',attributes:['id','insurance_Name','price']},
-                {model:VariantModel,as:'variants',attributes:['id','variant','price']},
-                {model:ColorModel,as:'colors',attributes:['id','color','price']},
-                {model:VASModel,as:'vas',attributes:['id','VAS_Name','price']}
+        // Parse and validate the 'page' and 'limit' query parameters
+        const page = Math.max(parseInt(req.query.page) || 1, 1); // Default to page 1, minimum value is 1
+        const limitParam = req.query.limit;
+
+        // Handle 'ALL' limit case or set a default
+        const limit = limitParam === 'ALL' ? null : Math.max(parseInt(limitParam) || 100, 1); // Default to 100 if not provided
+        const offset = limit ? (page - 1) * limit : null; // Calculate offset if limit is not null
+
+        // Query the database with pagination
+        const { rows: modelNames, count: totalItems } = await ModelNames.findAndCountAll({
+            include: [
+                { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'AccessoryName', 'price'] },
+                { model: InsuranceModel, as: 'insurances', attributes: ['id', 'insurance_Name', 'price'] },
+                { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
+                { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
+                { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'price'] }
             ],
             limit,
             offset,
         });
-        
+
+
+        const count=await ModelNames.count();
+
+        // Prepare and send the response
         res.status(200).json({
-            totalItems: modelNames.count,
-            totalPages: Math.ceil(modelNames.count / limit),
+            totalItems:count,
+            totalPages:limitParam=="ALL"?1:Math.ceil(count / limit),
             currentPage: page,
-            data: modelNames.rows
+            data: modelNames,
         });
     } catch (error) {
         console.error('Error retrieving model names:', error);
         res.status(500).json({ error: 'Failed to retrieve model names' });
     }
-}
+};
+
+
 
 exports.UpdateModel=async(req,res)=>{
     try {
