@@ -32,9 +32,9 @@ exports.get = async (req, resp) => {
             limit,
             offset,
         });
-        getQuotation.rows.map((item) => {
-            item.accessories = JSON.parse(item.accessories);
-        });
+        // getQuotation.rows.map((item) => {
+        //     item.accessories = JSON.parse(item.accessories);
+        // });
         return resp.status(200).json({
             totalItems: getQuotation.count,
             totalPages: Math.ceil(getQuotation.count / limit),
