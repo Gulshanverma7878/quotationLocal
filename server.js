@@ -53,7 +53,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send('update pagination update ModelName ');
+    res.send('Update Quotation Get countroll');
 })
 
 
