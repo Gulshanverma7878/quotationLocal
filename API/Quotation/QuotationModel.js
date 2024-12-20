@@ -9,7 +9,7 @@ QuotationModel.init({
         primaryKey: true,
         autoIncrement: true
     },
-    modelname: {
+    modelnames: {
         type: DataTypes.STRING(100),
         allowNull: true,
     },
