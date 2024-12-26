@@ -20,11 +20,11 @@ Accessories.init({
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   },
-  AccessoryName: {
+  accessories_name: {
     type: DataTypes.STRING(100),
     allowNull: true,
   },
-  price:{
+  accessories_price:{
     type: DataTypes.BIGINT,
     allowNull: true
   },

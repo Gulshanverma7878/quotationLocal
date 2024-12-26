@@ -76,11 +76,11 @@ exports.CreateModelName = async (req, res) => {
         // Query the database with pagination
         const { rows: modelNames, count: totalItems } = await ModelNames.findAndCountAll({
             include: [
-                { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'AccessoryName', 'price'] },
+                { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
                 { model: InsuranceModel, as: 'insurances', attributes: ['id', 'insurance_Name', 'price'] },
                 { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
                 { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
-                { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'price'] }
+                { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'VAS_price'] }
             ],
             limit,
             offset,
@@ -166,58 +166,374 @@ exports.getallDetail=async(req,res)=>{
     }
 }
 
+// exports.excel = async (req, res) => {
+//     try {
+//         let data;
+        
+//             console.log('Processing Excel file');
+//             const file = req.files.excelFile;
+//             const workbook = xlsx.read(file.data, { type: 'buffer' });
+//             const sheetName = workbook.SheetNames[0];
+//             const sheet = workbook.Sheets[sheetName];
+//             data = xlsx.utils.sheet_to_json(sheet);
+        
+//         for (const item of data) {
+//             const insuranceDetails = item.insurance_details || {};
+//             const insuranceNames = [];
+//             for (let i = 1; i <= 4; i++) { // Loop based on the number of insurance fields
+//                 if (item[`insurance${i}`] && item[`price${i}`]) {
+//                     insuranceNames.push({
+//                         name: item[`insurance${i}`],
+//                         price: item[`price${i}`],
+//                     });
+//                 }
+//             }
+
+            
+//             const existingModel = await ModelNames.findOne({ where: { VC_Code: item.VC_Code } });
+
+//             let model;
+//             if (existingModel) {
+                
+//                 model = await existingModel.update(item);
+//             } else {
+                
+//                 model = await ModelNames.create(item);
+//             }
+            
+//             for (const ins of insuranceNames) {
+//                 console.log(ins)
+//                 const existingInsurance = await InsuranceModel.findOne({
+//                     where: { insurance_Name: ins.name, modelId: model.id },
+//                 });
+
+//                 if (existingInsurance) {
+                    
+//                     await existingInsurance.update({ price: ins.price });
+//                 } else {
+                    
+//                     await InsuranceModel.create({
+//                         insurance_Name: ins.name,
+//                         price: ins.price,
+//                         modelId: model.id,
+//                     });
+//                 }
+//             }
+//         }
+
+//         console.log('Data successfully processed');
+//         res.status(200).json({ message: 'Data successfully processed.' });
+//     } catch (error) {
+//         console.error('Error processing data:', error.message, error.stack);
+//         res.status(500).json({ error: 'Failed to process data.' });
+//     }
+// };
+
+
+
+// exports.excel = async (req, res) => {
+//     try {
+//         let data;
+
+//         console.log('Processing Excel file');
+//         const file = req.files.excelFile;
+//         const workbook = xlsx.read(file.data, { type: 'buffer' });
+//         const sheetName = workbook.SheetNames[0];
+//         const sheet = workbook.Sheets[sheetName];
+//         data = xlsx.utils.sheet_to_json(sheet);
+
+//         for (const item of data) {
+//             const insuranceDetails = item.insurance_details || {};
+//             const insuranceNames = [];
+//             const VASDetails = item.VAS_details || {};
+//             const VASNames = [];
+//             const accessoriesDetails = item.accessories_details || {};
+//             const accessoriesNames = [];
+
+//             let length = Math.min(Object.keys(insuranceDetails).length / 2, 4);
+//             console.log(length);
+//             for (let i = 1; i <= 20; i++) {
+//                 if (item[`insurance${i}`] && item[`price${i}`]) {
+//                     insuranceNames.push({
+//                         name: item[`insurance${i}`],
+//                         price: item[`price${i}`],
+//                     });
+//                 }
+//             }
+
+//             length = Math.min(Object.keys(VASDetails).length / 2, 4);
+//             for (let i = 1; i <= 20; i++) {
+//                 if (item[`VAS_Name${i}`] && item[`VAS_price${i}`]) {
+//                     VASNames.push({
+//                         name: item[`VAS_Name${i}`],
+//                         price: item[`VAS_price${i}`],
+//                     });
+//                 }
+//             }
+            
+//             length = Math.min(Object.keys(accessoriesDetails).length / 2, 4);
+//             for (let i = 1; i <= 20; i++) {
+//                 if (item[`accessories_Name${i}`] && item[`accessories_price${i}`]) {
+//                     accessoriesNames.push({
+//                         name: item[`accessories_Name${i}`],
+//                         price: item[`accessories_price${i}`],
+//                     });
+//                 }
+//             }
+
+
+//             console.log('Processing item:', item);
+//             const existingModel = await ModelNames.findOne({ where: { VC_Code: item.VC_Code } });
+
+//             let model;
+//             if (existingModel) {
+//                 model = await existingModel.update(item);
+//             } else {
+//                 model = await ModelNames.create(item);
+//             }
+
+//             // Handle bulk create or update for insurance
+//             const existingInsuranceRecords = await InsuranceModel.findAll({
+//                 where: { modelId: model.id },
+//             });
+
+//             const insuranceToUpdate = [];
+//             const insuranceToCreate = [];
+
+//             for (const ins of insuranceNames) {
+//                 const existing = existingInsuranceRecords.find(record => record.insurance_Name === ins.name);
+//                 if (existing) {
+//                     insuranceToUpdate.push({
+//                         id: existing.id,
+//                         price: ins.price,
+//                     });
+//                 } else {
+//                     insuranceToCreate.push({
+//                         insurance_Name: ins.name,
+//                         price: ins.price,
+//                         modelId: model.id,
+//                     });
+//                 }
+//             }
+
+//             // Bulk create and update insurance
+//             if (insuranceToCreate.length) {
+//                 await InsuranceModel.bulkCreate(insuranceToCreate);
+//             }
+//             for (const ins of insuranceToUpdate) {
+//                 await InsuranceModel.update(
+//                     { price: ins.price },
+//                     { where: { id: ins.id } }
+//                 );
+//             }
+
+//             // Handle bulk create or update for VAS
+//             const existingVASRecords = await VASModel.findAll({
+//                 where: { modelId: model.id },
+//             });
+
+//             const VASToUpdate = [];
+//             const VASToCreate = [];
+
+//             for (const vas of VASNames) {
+//                 const existing = existingVASRecords.find(record => record.VAS_Name === vas.name);
+//                 if (existing) {
+//                     VASToUpdate.push({
+//                         id: existing.id,
+//                         price: vas.price,
+//                     });
+//                 } else {
+//                     VASToCreate.push({
+//                         VAS_Name: vas.name,
+//                         VAS_price: vas.price,
+//                         modelId: model.id,
+//                     });
+//                 }
+//             }
+
+//             // Bulk create and update VAS
+//             if (VASToCreate.length) {
+//          const vas=       await VASModel.bulkCreate(VASToCreate);
+//             console.log(vas)
+
+//             }
+//             for (const vas of VASToUpdate) {
+//                 await VASModel.update(
+//                     { VAS_price: vas.price },
+//                     { where: { id: vas.id } }
+//                 );
+//             }
+
+//             // Handle bulk create or update for Accessories
+            
+//         }
+
+//         console.log('Data successfully processed');
+//         res.status(200).json({ message: 'Data successfully processed.' });
+//     } catch (error) {
+//         console.error('Error processing data:', error.message, error.stack);
+//         res.status(500).json({ error: 'Failed to process data.' });
+//     }
+// };
+
+
+
+
 exports.excel = async (req, res) => {
     try {
         let data;
-        
-            console.log('Processing Excel file');
-            const file = req.files.excelFile;
-            const workbook = xlsx.read(file.data, { type: 'buffer' });
-            const sheetName = workbook.SheetNames[0];
-            const sheet = workbook.Sheets[sheetName];
-            data = xlsx.utils.sheet_to_json(sheet);
-        
+
+        console.log('Processing Excel file');
+        const file = req.files.excelFile;
+        const workbook = xlsx.read(file.data, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        data = xlsx.utils.sheet_to_json(sheet);
+
         for (const item of data) {
             const insuranceDetails = item.insurance_details || {};
             const insuranceNames = [];
-            for (let i = 1; i <= 4; i++) { // Loop based on the number of insurance fields
+            const VASDetails = item.VAS_details || {};
+            const VASNames = [];
+            const accessoriesDetails = item.accessories_details || {};
+            const accessoriesNames = [];
+
+            for (let i = 1; i <= 20; i++) {
                 if (item[`insurance${i}`] && item[`price${i}`]) {
                     insuranceNames.push({
                         name: item[`insurance${i}`],
                         price: item[`price${i}`],
                     });
                 }
+
+                if (item[`VAS_Name${i}`] && item[`VAS_price${i}`]) {
+                    VASNames.push({
+                        name: item[`VAS_Name${i}`],
+                        price: item[`VAS_price${i}`],
+                    });
+                }
+
+                if (item[`accessories_name${i}`] && item[`accessories_price${i}`]) {
+                    accessoriesNames.push({
+                        name: item[`accessories_name${i}`],
+                        price: item[`accessories_price${i}`],
+                    });
+                }
             }
 
-            
+            console.log('Processing item:', item);
             const existingModel = await ModelNames.findOne({ where: { VC_Code: item.VC_Code } });
 
             let model;
             if (existingModel) {
-                
                 model = await existingModel.update(item);
             } else {
-                
                 model = await ModelNames.create(item);
             }
-            
-            for (const ins of insuranceNames) {
-                console.log(ins)
-                const existingInsurance = await InsuranceModel.findOne({
-                    where: { insurance_Name: ins.name, modelId: model.id },
-                });
 
-                if (existingInsurance) {
-                    
-                    await existingInsurance.update({ price: ins.price });
+            // Handle bulk create or update for insurance
+            const existingInsuranceRecords = await InsuranceModel.findAll({
+                where: { modelId: model.id },
+            });
+
+            const insuranceToUpdate = [];
+            const insuranceToCreate = [];
+
+            for (const ins of insuranceNames) {
+                const existing = existingInsuranceRecords.find(record => record.insurance_Name === ins.name);
+                if (existing) {
+                    insuranceToUpdate.push({
+                        id: existing.id,
+                        price: ins.price,
+                    });
                 } else {
-                    
-                    await InsuranceModel.create({
+                    insuranceToCreate.push({
                         insurance_Name: ins.name,
                         price: ins.price,
                         modelId: model.id,
                     });
                 }
+            }
+
+            if (insuranceToCreate.length) {
+                await InsuranceModel.bulkCreate(insuranceToCreate);
+            }
+            for (const ins of insuranceToUpdate) {
+                await InsuranceModel.update(
+                    { price: ins.price },
+                    { where: { id: ins.id } }
+                );
+            }
+
+            // Handle bulk create or update for VAS
+            const existingVASRecords = await VASModel.findAll({
+                where: { modelId: model.id },
+            });
+
+            const VASToUpdate = [];
+            const VASToCreate = [];
+
+            for (const vas of VASNames) {
+                const existing = existingVASRecords.find(record => record.VAS_Name === vas.name);
+                if (existing) {
+                    VASToUpdate.push({
+                        id: existing.id,
+                        price: vas.price,
+                    });
+                } else {
+                    VASToCreate.push({
+                        VAS_Name: vas.name,
+                        VAS_price: vas.price,
+                        modelId: model.id,
+                    });
+                }
+            }
+
+            if (VASToCreate.length) {
+                await VASModel.bulkCreate(VASToCreate);
+            }
+            for (const vas of VASToUpdate) {
+                await VASModel.update(
+                    { VAS_price: vas.price },
+                    { where: { id: vas.id } }
+                );
+            }
+
+            // Handle bulk create or update for Accessories
+            const existingAccessoriesRecords = await AccessoriesModel.findAll({
+                where: { modelId: model.id },
+            });
+
+            const accessoriesToUpdate = [];
+            const accessoriesToCreate = [];
+
+            for (const acc of accessoriesNames) {
+                console.log(acc);
+                const existing = existingAccessoriesRecords.find(record => record.accessories_Name === acc.name);
+                if (existing) {
+                    accessoriesToUpdate.push({
+                        id: existing.id,
+                        price: acc.price,
+                    });
+                } else {
+                    accessoriesToCreate.push({
+                        accessories_name: acc.name,
+                        accessories_price: acc.price,
+                        modelId: model.id,
+                    });
+                }
+            }
+
+
+            if (accessoriesToCreate.length) {
+                console.log(accessoriesToCreate);
+                await AccessoriesModel.bulkCreate(accessoriesToCreate);
+            }
+            for (const acc of accessoriesToUpdate) {
+                await AccessoriesModel.update(
+                    { accessories_price: acc.price },
+                    { where: { id: acc.id } }
+                );
             }
         }
 
@@ -228,6 +544,4 @@ exports.excel = async (req, res) => {
         res.status(500).json({ error: 'Failed to process data.' });
     }
 };
-
-
 

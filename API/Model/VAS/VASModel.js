@@ -24,7 +24,7 @@ VAS.init({
     type: DataTypes.STRING(100),
     allowNull: true,
   },
-  price:{
+  VAS_price:{
     type: DataTypes.BIGINT,
     allowNull: true
   },
