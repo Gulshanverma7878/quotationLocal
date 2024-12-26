@@ -52,13 +52,10 @@ const ModelRoute=require('./API/Model/ModelRoute');
 const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
-app.get('/delete', (req, res) => {
-    sequelize.query('drop table accessories ')
-   res.send('UPdate VAS and Accessories');
-});
+
 
 app.get('/', (req, res) => {
-    res.send('UPdate VAS and Accessories');
+    res.send('UPdate VAS and Accessories  hello ');
 });
 
 
