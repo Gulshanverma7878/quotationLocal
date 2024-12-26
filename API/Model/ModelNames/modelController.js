@@ -146,11 +146,11 @@ exports.getallDetail=async(req,res)=>{
         const {id}=req.params;
         const modelname=await ModelNames.findAll({where:{id},
             include:[
-                {model:AccessoriesModel,as:'accessories',attributes:['id','AccessoryName','price']},
-                {model:InsuranceModel,as:'insurances',attributes:['id','insurance_Name','price']},
-                {model:VariantModel,as:'variants',attributes:['id','variant','price']},
-                {model:ColorModel,as:'colors',attributes:['id','color','price']},
-                {model:VASModel,as:'vas',attributes:['id','VAS_Name','price']}
+                { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
+                { model: InsuranceModel, as: 'insurances', attributes: ['id', 'insurance_Name', 'price'] },
+                { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
+                { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
+                { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'VAS_price'] }
             ],
             attributes:{
                 exclude: ['createdAt', 'updatedAt']
