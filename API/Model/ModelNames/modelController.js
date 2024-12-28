@@ -24,7 +24,9 @@ exports.CreateModelName = async (req, res) => {
         var statusCode=200;
       }
   
-      const insuranceDetails = req.body.insurance_details;
+      const insuranceDetails = JSON.parse(req.body.insurance_details);
+      console.log(insuranceDetails);
+
       if (insuranceDetails) {
           for (const [key, value] of Object.entries(insuranceDetails)) {
               if (!key.startsWith('insurance') || !value) continue;
