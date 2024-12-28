@@ -79,7 +79,7 @@ exports.CreateModelName = async (req, res) => {
         const { rows: modelNames, count: totalItems } = await ModelNames.findAndCountAll({
             include: [
                 { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
-                { model: InsuranceModel, as: 'insurances', attributes: ['id', 'insurance_Name', 'price'] },
+                { model: InsuranceModel, as: 'insurances', attributes: ['id',[ 'insurance_Name','insurance'], 'price'] },
                 { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
                 { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
                 { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'VAS_price'] }

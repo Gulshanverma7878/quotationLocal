@@ -55,7 +55,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send('Update  insurance add with single   ');
+    res.send('insurance_name to insurance ');
 });
 
 
