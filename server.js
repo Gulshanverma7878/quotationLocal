@@ -55,7 +55,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send('insurance_name to insurance ');
+    res.send('add vas and accessories post function ');
 });
 
 

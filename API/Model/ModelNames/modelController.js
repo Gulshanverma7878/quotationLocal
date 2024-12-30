@@ -1,10 +1,11 @@
 const ModelNames=require('./modelName.js');
-const AccessoriesModel=require('../Accessories/AccessoriesModel');
+// const AccessoriesModel=require('../Accessories/AccessoriesModel');
 const InsuranceModel=require('../Insurance/InsuranceModel');
 const VariantModel=require('../variants/variantModel');
 const ColorModel=require('../colors/ColorModel');
 const VASModel=require('../VAS/VASModel');
 const xlsx = require('xlsx');
+const AccessoriesModel = require('../Accessories/AccessoriesModel');
 
 
 exports.CreateModelName = async (req, res) => {
@@ -24,8 +25,10 @@ exports.CreateModelName = async (req, res) => {
         var statusCode=200;
       }
   
-      const insuranceDetails = JSON.parse(req.body.insurance_details);
+      const insuranceDetails = req.body.insurance_details;
       console.log(insuranceDetails);
+      const Accessories = req.body.Accessories;
+        console.log(Accessories);
 
       if (insuranceDetails) {
           for (const [key, value] of Object.entries(insuranceDetails)) {
@@ -55,6 +58,67 @@ exports.CreateModelName = async (req, res) => {
           }
       }
 
+
+      if (Accessories) {
+        for (const [key, value] of Object.entries(Accessories)) {
+            if (!key.startsWith('accessories') || !value) continue;
+            const index = key.match(/\d+/)?.[0];
+            const priceKey = `accessories_price${index}`;
+            const price = Accessories[priceKey];
+
+            if (!price) continue;
+            const dataId = ExistData ? ExistData.id : modelname.id;
+            
+            const existingInsurance = await AccessoriesModel.findOne({
+                where: { accessories_name: value, modelId: dataId }
+            });
+
+            if (existingInsurance) {
+                await existingInsurance.update({ accessories_price:price });
+                console.log(`Updated insurance: ${value} with price: ${price}`);
+            } else {
+                await AccessoriesModel.create({
+                    accessories_name: value,
+                    accessories_price:price,
+                    modelId: modelname.id,
+                });
+                console.log(`Created new insurance: ${value} with price: ${price}`);
+            }
+        }
+    }
+
+    const VAS = req.body.VAS_data;
+    console.log("VAS");
+    if (VAS) {
+        console.log(VAS);
+        for (const [key, value] of Object.entries(VAS)) {
+            if (!key.startsWith('VAS') || !value) continue;
+            const index = key.match(/\d+/)?.[0];
+            const priceKey = `VAS_price${index}`;
+            const price = VAS[priceKey];
+            console.log(value,price,"sdasf",modelname.id);
+
+            if (!price) continue;
+            const dataId = ExistData ? ExistData.id : modelname.id;
+            
+            const existingInsurance = await VASModel.findOne({
+                where: { VAS_Name: value, modelId: dataId }
+            });
+
+            if (existingInsurance) {
+                await existingInsurance.update({ VAS_price:price });
+                console.log(`Updated insurance: ${value} with price: ${price}`);
+            } else {
+                console.log(value,price,modelname.id);
+            const VASADD=    await VASModel.create({
+                    VAS_Name: value,
+                    VAS_price:price,
+                    modelId: modelname.id,
+                });
+                console.log(VASADD);
+            }
+        }
+    }
 
       res.status(statusCode).json(modelname);
     } catch (error) {
@@ -542,7 +606,7 @@ exports.excel = async (req, res) => {
         console.log('Data successfully processed');
         res.status(200).json({ message: 'Data successfully processed.' });
     } catch (error) {
-        console.error('Error processing data:', error.message, error.stack);
+        console.log('Error processing data:', error);
         res.status(500).json({ error: 'Failed to process data.' });
     }
 };
