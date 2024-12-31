@@ -61,7 +61,7 @@ exports.CreateModelName = async (req, res) => {
 
         if (Accessories) {
             for (const [key, value] of Object.entries(Accessories)) {
-                if (!key.startsWith('accessories') || !value) continue;
+                if (!key.startsWith('accessories_name') || !value) continue;
                 const index = key.match(/\d+/)?.[0];
                 const priceKey = `accessories_price${index}`;
                 const price = Accessories[priceKey];
@@ -92,7 +92,7 @@ exports.CreateModelName = async (req, res) => {
         if (VAS) {
             console.log(VAS);
             for (const [key, value] of Object.entries(VAS)) {
-                if (!key.startsWith('VAS') || !value) continue;
+                if (!key.startsWith('VAS_Name') || !value) continue;
                 const index = key.match(/\d+/)?.[0];
                 const priceKey = `VAS_price${index}`;
                 const price = VAS[priceKey];
