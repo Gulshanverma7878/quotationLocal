@@ -25,9 +25,9 @@ exports.CreateModelName = async (req, res) => {
             var statusCode = 200;
         }
 
-        const insuranceDetails = req.body.insurance_details;
+        const insuranceDetails = JSON.parse(req.body.insurance_details);
         console.log(insuranceDetails);
-        const Accessories = req.body.Accessories;
+        const Accessories = JSON.parse(req.body.Accessories);
         console.log(Accessories);
 
         if (insuranceDetails) {
@@ -87,7 +87,7 @@ exports.CreateModelName = async (req, res) => {
             }
         }
 
-        const VAS = req.body.VAS_data;
+        const VAS = JSON.parse(req.body.VAS_data);
         console.log("VAS");
         if (VAS) {
             console.log(VAS);

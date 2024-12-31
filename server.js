@@ -55,7 +55,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send('add vas and accessories post function ');
+    res.send('add vas and accessories post function add json parse ');
 });
 
 
