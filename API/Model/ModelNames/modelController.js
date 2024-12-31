@@ -1,135 +1,135 @@
-const ModelNames=require('./modelName.js');
+const ModelNames = require('./modelName.js');
 // const AccessoriesModel=require('../Accessories/AccessoriesModel');
-const InsuranceModel=require('../Insurance/InsuranceModel');
-const VariantModel=require('../variants/variantModel');
-const ColorModel=require('../colors/ColorModel');
-const VASModel=require('../VAS/VASModel');
+const InsuranceModel = require('../Insurance/InsuranceModel');
+const VariantModel = require('../variants/variantModel');
+const ColorModel = require('../colors/ColorModel');
+const VASModel = require('../VAS/VASModel');
 const xlsx = require('xlsx');
 const AccessoriesModel = require('../Accessories/AccessoriesModel');
 
 
 exports.CreateModelName = async (req, res) => {
     try {
-      const { modelName, by, VC_Code, insurance_details } = req.body;
-  
-      // Check if the VC_Code already exists
-      const ExistData = await ModelNames.findOne({ where: { VC_Code } });
-      
-      let modelname;
-      
-      if (ExistData) {
-        modelname = await ModelNames.update(req.body, { where: { VC_Code }});
-        var statusCode=203;
-      } else {
-        modelname = await ModelNames.create(req.body);
-        var statusCode=200;
-      }
-  
-      const insuranceDetails = req.body.insurance_details;
-      console.log(insuranceDetails);
-      const Accessories = req.body.Accessories;
+        const { modelName, by, VC_Code, insurance_details } = req.body;
+
+        // Check if the VC_Code already exists
+        const ExistData = await ModelNames.findOne({ where: { VC_Code } });
+
+        let modelname;
+
+        if (ExistData) {
+            modelname = await ModelNames.update(req.body, { where: { VC_Code } });
+            var statusCode = 203;
+        } else {
+            modelname = await ModelNames.create(req.body);
+            var statusCode = 200;
+        }
+
+        const insuranceDetails = req.body.insurance_details;
+        console.log(insuranceDetails);
+        const Accessories = req.body.Accessories;
         console.log(Accessories);
 
-      if (insuranceDetails) {
-          for (const [key, value] of Object.entries(insuranceDetails)) {
-              if (!key.startsWith('insurance') || !value) continue;
-              const index = key.match(/\d+/)?.[0];
-              const priceKey = `price${index}`;
-              const price = insuranceDetails[priceKey];
+        if (insuranceDetails) {
+            for (const [key, value] of Object.entries(insuranceDetails)) {
+                if (!key.startsWith('insurance') || !value) continue;
+                const index = key.match(/\d+/)?.[0];
+                const priceKey = `price${index}`;
+                const price = insuranceDetails[priceKey];
 
-              if (!price) continue;
-              const dataId = ExistData ? ExistData.id : modelname.id;
-              
-              const existingInsurance = await InsuranceModel.findOne({
-                  where: { insurance_Name: value, modelId: dataId }
-              });
+                if (!price) continue;
+                const dataId = ExistData ? ExistData.id : modelname.id;
 
-              if (existingInsurance) {
-                  await existingInsurance.update({ price });
-                  console.log(`Updated insurance: ${value} with price: ${price}`);
-              } else {
-                  await InsuranceModel.create({
-                      insurance_Name: value,
-                      price,
-                      modelId: modelname.id,
-                  });
-                  console.log(`Created new insurance: ${value} with price: ${price}`);
-              }
-          }
-      }
-
-
-      if (Accessories) {
-        for (const [key, value] of Object.entries(Accessories)) {
-            if (!key.startsWith('accessories') || !value) continue;
-            const index = key.match(/\d+/)?.[0];
-            const priceKey = `accessories_price${index}`;
-            const price = Accessories[priceKey];
-
-            if (!price) continue;
-            const dataId = ExistData ? ExistData.id : modelname.id;
-            
-            const existingInsurance = await AccessoriesModel.findOne({
-                where: { accessories_name: value, modelId: dataId }
-            });
-
-            if (existingInsurance) {
-                await existingInsurance.update({ accessories_price:price });
-                console.log(`Updated insurance: ${value} with price: ${price}`);
-            } else {
-                await AccessoriesModel.create({
-                    accessories_name: value,
-                    accessories_price:price,
-                    modelId: modelname.id,
+                const existingInsurance = await InsuranceModel.findOne({
+                    where: { insurance_Name: value, modelId: dataId }
                 });
-                console.log(`Created new insurance: ${value} with price: ${price}`);
+
+                if (existingInsurance) {
+                    await existingInsurance.update({ price });
+                    console.log(`Updated insurance: ${value} with price: ${price}`);
+                } else {
+                    await InsuranceModel.create({
+                        insurance_Name: value,
+                        price,
+                        modelId: modelname.id,
+                    });
+                    console.log(`Created new insurance: ${value} with price: ${price}`);
+                }
             }
         }
-    }
 
-    const VAS = req.body.VAS_data;
-    console.log("VAS");
-    if (VAS) {
-        console.log(VAS);
-        for (const [key, value] of Object.entries(VAS)) {
-            if (!key.startsWith('VAS') || !value) continue;
-            const index = key.match(/\d+/)?.[0];
-            const priceKey = `VAS_price${index}`;
-            const price = VAS[priceKey];
-            console.log(value,price,"sdasf",modelname.id);
 
-            if (!price) continue;
-            const dataId = ExistData ? ExistData.id : modelname.id;
-            
-            const existingInsurance = await VASModel.findOne({
-                where: { VAS_Name: value, modelId: dataId }
-            });
+        if (Accessories) {
+            for (const [key, value] of Object.entries(Accessories)) {
+                if (!key.startsWith('accessories') || !value) continue;
+                const index = key.match(/\d+/)?.[0];
+                const priceKey = `accessories_price${index}`;
+                const price = Accessories[priceKey];
 
-            if (existingInsurance) {
-                await existingInsurance.update({ VAS_price:price });
-                console.log(`Updated insurance: ${value} with price: ${price}`);
-            } else {
-                console.log(value,price,modelname.id);
-            const VASADD=    await VASModel.create({
-                    VAS_Name: value,
-                    VAS_price:price,
-                    modelId: modelname.id,
+                if (!price) continue;
+                const dataId = ExistData ? ExistData.id : modelname.id;
+
+                const existingInsurance = await AccessoriesModel.findOne({
+                    where: { accessories_name: value, modelId: dataId }
                 });
-                console.log(VASADD);
+
+                if (existingInsurance) {
+                    await existingInsurance.update({ accessories_price: price });
+                    console.log(`Updated insurance: ${value} with price: ${price}`);
+                } else {
+                    await AccessoriesModel.create({
+                        accessories_name: value,
+                        accessories_price: price,
+                        modelId: modelname.id,
+                    });
+                    console.log(`Created new insurance: ${value} with price: ${price}`);
+                }
             }
         }
-    }
 
-      res.status(statusCode).json(modelname);
+        const VAS = req.body.VAS_data;
+        console.log("VAS");
+        if (VAS) {
+            console.log(VAS);
+            for (const [key, value] of Object.entries(VAS)) {
+                if (!key.startsWith('VAS') || !value) continue;
+                const index = key.match(/\d+/)?.[0];
+                const priceKey = `VAS_price${index}`;
+                const price = VAS[priceKey];
+                console.log(value, price, "sdasf", modelname.id);
+
+                if (!price) continue;
+                const dataId = ExistData ? ExistData.id : modelname.id;
+
+                const existingInsurance = await VASModel.findOne({
+                    where: { VAS_Name: value, modelId: dataId }
+                });
+
+                if (existingInsurance) {
+                    await existingInsurance.update({ VAS_price: price });
+                    console.log(`Updated insurance: ${value} with price: ${price}`);
+                } else {
+                    console.log(value, price, modelname.id);
+                    const VASADD = await VASModel.create({
+                        VAS_Name: value,
+                        VAS_price: price,
+                        modelId: modelname.id,
+                    });
+                    console.log(VASADD);
+                }
+            }
+        }
+
+        res.status(statusCode).json(modelname);
     } catch (error) {
-      // If any error, rollback the transaction
-      console.error('Error creating model name:', error);
-      res.status(500).json({ error: 'Failed to create model name' });
+        // If any error, rollback the transaction
+        console.error('Error creating model name:', error);
+        res.status(500).json({ error: 'Failed to create model name' });
     }
-  };
-  
+};
 
-  exports.getAllModelNames = async (req, res) => {
+
+exports.getAllModelNames = async (req, res) => {
     try {
         // Parse and validate the 'page' and 'limit' query parameters
         const page = Math.max(parseInt(req.query.page) || 1, 1); // Default to page 1, minimum value is 1
@@ -143,7 +143,7 @@ exports.CreateModelName = async (req, res) => {
         const { rows: modelNames, count: totalItems } = await ModelNames.findAndCountAll({
             include: [
                 { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
-                { model: InsuranceModel, as: 'insurances', attributes: ['id',[ 'insurance_Name','insurance'], 'price'] },
+                { model: InsuranceModel, as: 'insurances', attributes: ['id', ['insurance_Name', 'insurance'], 'price'] },
                 { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
                 { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
                 { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'VAS_price'] }
@@ -153,12 +153,12 @@ exports.CreateModelName = async (req, res) => {
         });
 
 
-        const count=await ModelNames.count();
+        const count = await ModelNames.count();
 
         // Prepare and send the response
         res.status(200).json({
-            totalItems:count,
-            totalPages:limitParam=="ALL"?1:Math.ceil(count / limit),
+            totalItems: count,
+            totalPages: limitParam == "ALL" ? 1 : Math.ceil(count / limit),
             currentPage: page,
             data: modelNames,
         });
@@ -170,10 +170,10 @@ exports.CreateModelName = async (req, res) => {
 
 
 
-exports.UpdateModel=async(req,res)=>{
+exports.UpdateModel = async (req, res) => {
     try {
-        const {id}=req.params;
-        const modelname=await ModelNames.update(req.body,{where:{id}});
+        const { id } = req.params;
+        const modelname = await ModelNames.update(req.body, { where: { id } });
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error updating model name:', error);
@@ -181,10 +181,10 @@ exports.UpdateModel=async(req,res)=>{
     }
 }
 
-exports.deleteModel=async(req,res)=>{
+exports.deleteModel = async (req, res) => {
     try {
-        const {id}=req.params;
-        const modelname=await ModelNames.destroy({where:{id}});
+        const { id } = req.params;
+        const modelname = await ModelNames.destroy({ where: { id } });
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error deleting model name:', error);
@@ -207,18 +207,19 @@ exports.getById = async (req, res) => {
     }
 }
 
-exports.getallDetail=async(req,res)=>{
+exports.getallDetail = async (req, res) => {
     try {
-        const {id}=req.params;
-        const modelname=await ModelNames.findAll({where:{id},
-            include:[
+        const { id } = req.params;
+        const modelname = await ModelNames.findAll({
+            where: { id },
+            include: [
                 { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
                 { model: InsuranceModel, as: 'insurances', attributes: ['id', 'insurance_Name', 'price'] },
                 { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
                 { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
                 { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'VAS_price'] }
             ],
-            attributes:{
+            attributes: {
                 exclude: ['createdAt', 'updatedAt']
             }
         });
@@ -235,14 +236,14 @@ exports.getallDetail=async(req,res)=>{
 // exports.excel = async (req, res) => {
 //     try {
 //         let data;
-        
+
 //             console.log('Processing Excel file');
 //             const file = req.files.excelFile;
 //             const workbook = xlsx.read(file.data, { type: 'buffer' });
 //             const sheetName = workbook.SheetNames[0];
 //             const sheet = workbook.Sheets[sheetName];
 //             data = xlsx.utils.sheet_to_json(sheet);
-        
+
 //         for (const item of data) {
 //             const insuranceDetails = item.insurance_details || {};
 //             const insuranceNames = [];
@@ -255,18 +256,18 @@ exports.getallDetail=async(req,res)=>{
 //                 }
 //             }
 
-            
+
 //             const existingModel = await ModelNames.findOne({ where: { VC_Code: item.VC_Code } });
 
 //             let model;
 //             if (existingModel) {
-                
+
 //                 model = await existingModel.update(item);
 //             } else {
-                
+
 //                 model = await ModelNames.create(item);
 //             }
-            
+
 //             for (const ins of insuranceNames) {
 //                 console.log(ins)
 //                 const existingInsurance = await InsuranceModel.findOne({
@@ -274,10 +275,10 @@ exports.getallDetail=async(req,res)=>{
 //                 });
 
 //                 if (existingInsurance) {
-                    
+
 //                     await existingInsurance.update({ price: ins.price });
 //                 } else {
-                    
+
 //                     await InsuranceModel.create({
 //                         insurance_Name: ins.name,
 //                         price: ins.price,
@@ -336,7 +337,7 @@ exports.getallDetail=async(req,res)=>{
 //                     });
 //                 }
 //             }
-            
+
 //             length = Math.min(Object.keys(accessoriesDetails).length / 2, 4);
 //             for (let i = 1; i <= 20; i++) {
 //                 if (item[`accessories_Name${i}`] && item[`accessories_price${i}`]) {
@@ -431,7 +432,7 @@ exports.getallDetail=async(req,res)=>{
 //             }
 
 //             // Handle bulk create or update for Accessories
-            
+
 //         }
 
 //         console.log('Data successfully processed');
