@@ -8,7 +8,7 @@ const xlsx = require('xlsx');
 const AccessoriesModel = require('../Accessories/AccessoriesModel');
 const NodeCache = require("node-cache");
 
-const myCache = new NodeCache({ stdTTL:500, checkperiod: 600 }); // 10 minutes cache 600 is equal to 10 minutes in seconds ttl is time to live 500 is equal to 8 minutes 20 seconds in seconds
+const myCache = new NodeCache({ stdTTL:600 , checkperiod: 600 }); // 10 minutes cache 600 is equal to 10 minutes in seconds ttl is time to live 500 is equal to 8 minutes 20 seconds in seconds 
 exports.CreateModelName = async (req, res) => {
     try {
         const { modelName, by, VC_Code, insurance_details } = req.body;
@@ -52,7 +52,7 @@ exports.CreateModelName = async (req, res) => {
                     await InsuranceModel.create({
                         insurance_Name: value,
                         price,
-                        modelId: modelname.id,
+                        modelId: dataId,
                     });
                     console.log(`Created new insurance: ${value} with price: ${price}`);
                 }
@@ -78,10 +78,12 @@ exports.CreateModelName = async (req, res) => {
                     await existingInsurance.update({ accessories_price: price });
                     console.log(`Updated insurance: ${value} with price: ${price}`);
                 } else {
+                    console.log("faasd")
+                    console.log(modelname.id);
                     await AccessoriesModel.create({
                         accessories_name: value,
                         accessories_price: price,
-                        modelId: modelname.id,
+                        modelId: dataId,
                     });
                     console.log(`Created new insurance: ${value} with price: ${price}`);
                 }
@@ -114,7 +116,7 @@ exports.CreateModelName = async (req, res) => {
                     const VASADD = await VASModel.create({
                         VAS_Name: value,
                         VAS_price: price,
-                        modelId: modelname.id,
+                        modelId: dataId,
                     });
                     console.log(VASADD);
                 }
@@ -656,7 +658,6 @@ exports.getAllModelNamesCache = async (req, res) => {
 
       
         const cachedData = myCache.get(cacheKey);
-        console.log(cachedData);
         if (cachedData) {
             console.log("Cache hit");
             return res.status(200).json({

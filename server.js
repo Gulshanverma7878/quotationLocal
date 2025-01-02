@@ -46,7 +46,7 @@ sequelize.sync({ alter: true }).then(() => {
 
 
 //import routes
-
+const InputRoute = require('./API/Model/Inputs/InputRoutes');
 const MemberRoute = require('./API/Member/memberRoute');
 const ModelRoute=require('./API/Model/ModelRoute');
 const QuotationRouter=require('./API/Quotation/QuotationRoute');
@@ -55,7 +55,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send('Fix adding model error single');
+    res.send('Inputs API With Caching ');
 });
 
 
@@ -64,6 +64,7 @@ app.get('/', (req, res) => {
 app.use('/api/member', MemberRoute);
 app.use('/api/model',ModelRoute);
 app.use('/api/quotation',QuotationRouter);
+app.use('/api/input', InputRoute);
 
 
 
