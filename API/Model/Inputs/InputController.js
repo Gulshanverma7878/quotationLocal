@@ -1,8 +1,10 @@
 const InputModel = require('./InputModel');
 const NodeCache = require('node-cache');
+const HPNListModel=require('./HPNList');
+
 
 const Inputcache = new NodeCache({ stdTTL: 600, checkperiod: 120 });//10 minutes
-
+const HPNCache = new NodeCache({ stdTTL: 600, checkperiod: 120 });//10 minutes  
 
 // Create and Save a new Input
 exports.create = async (req, res) => {
@@ -87,3 +89,97 @@ const  InvalidatedCache=async()=>{
     Inputcache.flushAll();
     console.log("Cache invalidated");
 }
+
+
+const  HPNInvalidatedCache=async()=>{
+    HPNListModel.flushAll();
+    console.log("Cache invalidated");
+}
+
+
+
+// HPN list 
+
+exports.createHPN = async (req, res) => {
+    try {
+        const hpn = await HPNListModel.create(req.body);
+        await InvalidatedCache();
+        res.status(200).json(hpn);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+exports.getAllHPN = async (req, res) => {
+    try {
+        console.log("Hello");
+        const cachedHPN = HPNCache.get("hpns");
+        if (cachedHPN) {
+            console.log("Cache hit");
+            return res.status(200).json(cachedHPN);
+        }
+        console.log("Cache miss");
+        const hpns = await HPNListModel.findAll();
+        HPNCache.set("hpns", hpns);
+        res.status(200).json(hpns);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+};
+
+// Retrieve a single HPN by id
+exports.getByIdHPN = async (req, res) => {
+    try {
+        console.log("get by id");
+        const { id } = req.params;
+        const cachedHPN = HPNCache.get(`hpn_id${id}`);
+        if (cachedHPN) {
+            console.log("Cache hit");
+            return res.status(200).json(cachedHPN);
+        }
+        const hpn = await HPNListModel.findByPk(id);
+        if (hpn) {
+            await HPNCache.set(`hpn_id${id}`, hpn);
+            res.status(200).json(hpn);
+        } else {
+            res.status(404).json({ message: 'HPN not found' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+};
+
+// Update an HPN by id
+exports.updateHPN = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [updatedRowsCount] = await HPNListModel.update(req.body, { where: { id } });
+        if (updatedRowsCount > 0) {
+            await HPNInvalidatedCache();
+            res.status(200).json({ message: 'HPN updated successfully' });
+        } else {
+            res.status(404).json({ message: 'HPN not found' });
+        }    
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+// Delete an HPN by id
+exports.deleteHPN = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedRowsCount = await HPNListModel.destroy({ where: { id } });
+        if (deletedRowsCount > 0) {
+            await HPNInvalidatedCache();
+            res.status(200).json({ message: 'HPN deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'HPN not found' });
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
