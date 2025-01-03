@@ -103,8 +103,8 @@ const  HPNInvalidatedCache=async()=>{
 exports.createHPN = async (req, res) => {
     try {
         const hpn = await HPNListModel.create(req.body);
-        await InvalidatedCache();
         res.status(200).json(hpn);
+        await HPNInvalidatedCache();
     } catch (error) {
         res.status(500).json(error);
     }
@@ -157,8 +157,8 @@ exports.updateHPN = async (req, res) => {
         const { id } = req.params;
         const [updatedRowsCount] = await HPNListModel.update(req.body, { where: { id } });
         if (updatedRowsCount > 0) {
-            await HPNInvalidatedCache();
             res.status(200).json({ message: 'HPN updated successfully' });
+            await HPNInvalidatedCache();
         } else {
             res.status(404).json({ message: 'HPN not found' });
         }    
@@ -173,8 +173,8 @@ exports.deleteHPN = async (req, res) => {
         const { id } = req.params;
         const deletedRowsCount = await HPNListModel.destroy({ where: { id } });
         if (deletedRowsCount > 0) {
-            await HPNInvalidatedCache();
             res.status(200).json({ message: 'HPN deleted successfully' });
+            await HPNInvalidatedCache();
         } else {
             res.status(404).json({ message: 'HPN not found' });
         }

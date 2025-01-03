@@ -55,7 +55,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send('Inputs API With Caching And HPN ');
+    res.send(' HPN ');
 });
 
 
