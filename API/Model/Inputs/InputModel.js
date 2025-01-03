@@ -21,7 +21,7 @@ InputModel.init({
         allowNull: true,
     },
     TCS_price: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.FLOAT,
         allowNull: true,
     },
     Scrap_Certificate: {
