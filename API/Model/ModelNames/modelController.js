@@ -737,7 +737,7 @@ exports.searchModel = async (req, res) => {
             where: {
                 [columnName]: name
             },
-            attributes: ['id', 'ppl', 'VC_Code', 'variant', ['fuel_type', 'fuel']]
+            attributes: ['id', 'ppl', 'VC_Code', 'variant', ['fuel_type', 'fuel'],'color']
         });
         console.log(modelname);
         res.status(200).json(modelname);
@@ -752,13 +752,31 @@ exports.searchColorByVariant = async (req, res) => {
         const variant = req.params.variant;
         const color= req.params.color;
         console.log(variant, color);
-        const modelname = await ModelNames.findAll({
+
+        const modelId= await ModelNames.findOne({
             where: {
                 variant: variant,
-                color: color
             },
+            attributes: ['id']
         });
-        console.log(modelname);
+        console.log(modelId.id);
+
+        const modelname = await ModelNames.findAll({
+            where: { id:modelId.id },
+            include: [
+                { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
+                { model: InsuranceModel, as: 'insurances', attributes: ['id', 'insurance_Name', 'price'] },
+                { model: VariantModel, as: 'variants', attributes: ['id', 'variant', 'price'] },
+                { model: ColorModel, as: 'colors', attributes: ['id', 'color', 'price'] },
+                { model: VASModel, as: 'vas', attributes: ['id', 'VAS_Name', 'VAS_price'] }
+            ],
+            attributes: {
+                exclude: ['createdAt', 'updatedAt']
+            },
+
+        });
+
+
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error retrieving model name:', error);
