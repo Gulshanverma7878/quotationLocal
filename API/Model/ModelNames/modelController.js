@@ -704,5 +704,26 @@ const invalidateModelNamesCache = async () => {
     const keys = myCache.keys();
     const keysToDelete = await keys.filter(key => key.startsWith('modelNamesPage_'));
     myCache.del(keysToDelete);
+    const modelNamesGet = myCache.get("modelNamesGet");
+    if (modelNamesGet) {
+        myCache.del("modelNamesGet");
+    }
     console.log('Cache invalidated:', keysToDelete);
 };
+
+exports.GetNames=async(req,resp)=>{
+    try {
+        if(myCache.has("modelNamesGet")){
+            console.log("Cache hit");
+            return resp.status(200).json(myCache.get("modelNamesGet"));
+        }
+        console.log("Cache miss");
+        const data=await ModelNames.findAll({
+            attributes:['id','ppl']
+        });
+        myCache.set("modelNamesGet",data);
+        resp.status(200).json(data);
+    } catch (error) {
+        resp.status(500).json({ error: 'Failed to retrieve model names' });
+    }
+}

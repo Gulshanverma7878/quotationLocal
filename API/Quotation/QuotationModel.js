@@ -85,10 +85,10 @@ QuotationModel.init({
         type: DataTypes.STRING(100),
         allowNull: true,
     },
-    HPNPrice: {
-        type: DataTypes.BIGINT,
-        allowNull: true,
-    },
+    // HPNPrice: {
+    //     type: DataTypes.BIGINT,
+    //     allowNull: true,
+    // },
     HPN: {
         type: DataTypes.STRING(100),
         allowNull: true,

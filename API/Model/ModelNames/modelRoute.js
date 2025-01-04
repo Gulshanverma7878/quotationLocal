@@ -3,6 +3,7 @@ const router = express.Router();
 const ModelController=require('./modelController');
 
 router.post('/',ModelController.CreateModelName);
+router.get('/getnames',ModelController.GetNames);
 router.get('/',ModelController.getAllModelNamesCache);//getAllModelNames
 router.get('/cache',ModelController.getAllModelNamesCache);//
 router.get('/:id',ModelController.getById);

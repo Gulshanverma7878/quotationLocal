@@ -13,8 +13,8 @@ HPNList.init({
         type:DataTypes.STRING(100),
         allowNull:true
     },
-    hpn_price:{
-        type:DataTypes.FLOAT,
+    other:{
+        type:DataTypes.STRING(100),
         allowNull:true
     }
 },{
