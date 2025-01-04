@@ -11,6 +11,8 @@ router.get('/detail/:id',ModelController.getallDetail); //cache
 router.put('/:id',ModelController.UpdateModel);
 router.post('/excel',ModelController.excel);
 router.delete('/:id',ModelController.deleteModel);
+router.get('/search/:columnName/:name',ModelController.searchModel);
+router.get('/search/varientcolor/:variant/:color',ModelController.searchColorByVariant);
 
 
 module.exports = router;

@@ -8,7 +8,7 @@ const xlsx = require('xlsx');
 const AccessoriesModel = require('../Accessories/AccessoriesModel');
 const NodeCache = require("node-cache");
 
-const myCache = new NodeCache({ stdTTL:600 , checkperiod: 600 }); // 10 minutes cache 600 is equal to 10 minutes in seconds ttl is time to live 500 is equal to 8 minutes 20 seconds in seconds 
+const myCache = new NodeCache({ stdTTL: 600, checkperiod: 600 }); // 10 minutes cache 600 is equal to 10 minutes in seconds ttl is time to live 500 is equal to 8 minutes 20 seconds in seconds 
 exports.CreateModelName = async (req, res) => {
     try {
         const { modelName, by, VC_Code, insurance_details } = req.body;
@@ -134,15 +134,15 @@ exports.CreateModelName = async (req, res) => {
 
 exports.getAllModelNames = async (req, res) => {
     try {
-      
-        const page = Math.max(parseInt(req.query.page) || 1, 1); 
+
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
         const limitParam = req.query.limit;
 
-        
+
         const limit = limitParam === 'ALL' ? null : Math.max(parseInt(limitParam) || 100, 1);
         const offset = limit ? (page - 1) * limit : null;
 
-        
+
         const { rows: modelNames, count: totalItems } = await ModelNames.findAndCountAll({
             include: [
                 { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
@@ -158,7 +158,7 @@ exports.getAllModelNames = async (req, res) => {
 
         const count = await ModelNames.count();
 
-      
+
         res.status(200).json({
             totalItems: count,
             totalPages: limitParam == "ALL" ? 1 : Math.ceil(count / limit),
@@ -201,7 +201,7 @@ exports.deleteModel = async (req, res) => {
 exports.getById = async (req, res) => {
     try {
         const { id } = req.params;
-        if(myCache.has(`modelNamesPage_${id}`)){
+        if (myCache.has(`modelNamesPage_${id}`)) {
             console.log("Cache hit");
             return res.status(200).json(myCache.get(`modelNamesPage_${id}`));
         }
@@ -221,8 +221,8 @@ exports.getById = async (req, res) => {
         if (!modelname) {
             return res.status(404).json({ error: 'Model name not found' });
         }
-        const key=`modelNamesPage_${id}`;
-        myCache.set(key,modelname);
+        const key = `modelNamesPage_${id}`;
+        myCache.set(key, modelname);
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error retrieving model name:', error);
@@ -234,7 +234,7 @@ exports.getallDetail = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if(myCache.has(`modelNamesPage_${id}`)){
+        if (myCache.has(`modelNamesPage_${id}`)) {
             return res.status(200).json(myCache.get(`modelNamesPage_${id}`));
         }
         const modelname = await ModelNames.findAll({
@@ -249,15 +249,15 @@ exports.getallDetail = async (req, res) => {
             attributes: {
                 exclude: ['createdAt', 'updatedAt']
             },
-          
+
         });
         if (!modelname) {
             return res.status(404).json({ error: 'Model name not found' });
         }
-        const key=`modelNamesPage_${id}`;
-        const plainModelname = modelname.map((item) => item.get ({ plain: true }));
+        const key = `modelNamesPage_${id}`;
+        const plainModelname = modelname.map((item) => item.get({ plain: true }));
         console.log(plainModelname);
-        myCache.set(key,plainModelname);
+        myCache.set(key, plainModelname);
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error retrieving model name:', error);
@@ -647,16 +647,16 @@ exports.excel = async (req, res) => {
 
 exports.getAllModelNamesCache = async (req, res) => {
     try {
-        const page = Math.max(parseInt(req.query.page) || 1, 1); 
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
         const limitParam = req.query.limit;
 
-        
-        const limit = limitParam === 'ALL' ? null : Math.max(parseInt(limitParam) || 100, 1); 
-        const offset = limit ? (page - 1) * limit : null; 
+
+        const limit = limitParam === 'ALL' ? null : Math.max(parseInt(limitParam) || 100, 1);
+        const offset = limit ? (page - 1) * limit : null;
 
         const cacheKey = `modelNamesPage_${page}_limit_${limit}`;
 
-      
+
         const cachedData = myCache.get(cacheKey);
         if (cachedData) {
             console.log("Cache hit");
@@ -668,7 +668,7 @@ exports.getAllModelNamesCache = async (req, res) => {
             });
         }
 
-      
+
         const { rows: modelNames, count: totalItems } = await ModelNames.findAndCountAll({
             include: [
                 { model: AccessoriesModel, as: 'accessories', attributes: ['id', 'accessories_name', 'accessories_price'] },
@@ -711,19 +711,57 @@ const invalidateModelNamesCache = async () => {
     console.log('Cache invalidated:', keysToDelete);
 };
 
-exports.GetNames=async(req,resp)=>{
+exports.GetNames = async (req, resp) => {
     try {
-        if(myCache.has("modelNamesGet")){
+        if (myCache.has("modelNamesGet")) {
             console.log("Cache hit");
             return resp.status(200).json(myCache.get("modelNamesGet"));
         }
         console.log("Cache miss");
-        const data=await ModelNames.findAll({
-            attributes:['id','ppl']
+        const data = await ModelNames.findAll({
+            attributes: ['id', 'ppl']
         });
-        myCache.set("modelNamesGet",data);
+        myCache.set("modelNamesGet", data);
         resp.status(200).json(data);
     } catch (error) {
         resp.status(500).json({ error: 'Failed to retrieve model names' });
+    }
+}
+
+
+exports.searchModel = async (req, res) => {
+    try {
+        const { name, columnName } = req.params;
+        console.log(name, columnName);
+        const modelname = await ModelNames.findAll({
+            where: {
+                [columnName]: name
+            },
+            attributes: ['id', 'ppl', 'VC_Code', 'variant', ['fuel_type', 'fuel']]
+        });
+        console.log(modelname);
+        res.status(200).json(modelname);
+    } catch (error) {
+        console.error('Error retrieving model name:', error);
+        res.status(500).json({ error: 'Failed to retrieve model name' });
+    }
+}
+
+exports.searchColorByVariant = async (req, res) => {
+    try {
+        const variant = req.params.variant;
+        const color= req.params.color;
+        console.log(variant, color);
+        const modelname = await ModelNames.findAll({
+            where: {
+                variant: variant,
+                color: color
+            },
+        });
+        console.log(modelname);
+        res.status(200).json(modelname);
+    } catch (error) {
+        console.error('Error retrieving model name:', error);
+        res.status(500).json({ error: 'Failed to retrieve model name' });
     }
 }
