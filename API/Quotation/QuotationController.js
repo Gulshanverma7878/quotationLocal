@@ -11,7 +11,7 @@ exports.Create = async (req, resp) => {
                 req.body.accessories=accessories;
                 console.log('Parsed accessories:', accessories);
             } catch (error) {
-                console.error('Invalid JSON string in accessories:', error.message);
+                console.log('Invalid JSON string in accessories:', error.message);
             }
         }
         const addQuotation = await QuotationModel.create(req.body);
@@ -32,9 +32,21 @@ exports.get = async (req, resp) => {
             limit,
             offset,
         });
-        // getQuotation.rows.map((item) => {
-        //     item.accessories = JSON.parse(item.accessories);
-        // });
+        getQuotation.rows.map((item) => {
+            if (typeof item.accessories === 'string') {
+                item.accessories = JSON.parse(item.accessories);
+            }
+            if (typeof item.vas === 'string') {
+                item.vas = JSON.parse(item.vas);
+            }
+            if (typeof item.insurances === 'string') {
+                item.insurances = JSON.parse(item.insurances);
+            }
+            if (typeof item.HPN === 'string') {
+                item.HPN = JSON.parse(item.HPN);
+            }
+        });
+
         return resp.status(200).json({
             totalItems: getQuotation.count,
             totalPages: Math.ceil(getQuotation.count / limit),
@@ -85,5 +97,3 @@ exports.updateQuotation = async (req, resp) => {
         return resp.status(500).json(error);
     }
 }
-
-

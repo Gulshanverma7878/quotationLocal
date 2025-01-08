@@ -55,7 +55,7 @@ const QuotationRouter=require('./API/Quotation/QuotationRoute');
 
 
 app.get('/', (req, res) => {
-    res.send(' HPN cache fix ');
+    res.send(' Get Model Name with Quantity ');
 });
 
 

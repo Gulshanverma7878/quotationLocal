@@ -8,11 +8,10 @@ exports.createMember = async (req, res) => {
     try {
         const { name, email, password, mobile_no } = req.body;
         const modelname = await MemberModel.create(req.body);
-        console.log(modelname);
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error creating model name:', error);
-        res.status(500).json({ error: 'Failed to create model name' });
+        res.status(500).json({ error: 'Failed to create model name',error });
     }
 }
 
@@ -67,6 +66,7 @@ exports.loginMember = async (req, res) => {
             },
             attributes: ['id', 'name', 'email', 'mobile_no', 'status', 'password']
         });
+        console.log(user);
         if (!user.status === true) {
             return res.status(401).json({ error: 'User is not active' });
         }
@@ -79,7 +79,7 @@ exports.loginMember = async (req, res) => {
             return res.status(401).json({ error: 'Incorrect password' });
         }
         delete user.dataValues.password;
-        const token = jwt.sign({ id: user.id }, 'krishan', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id }, 'krishan', { expiresIn: '7d' });
         res.cookie('token', token);
         res.status(200).json({
             message: 'Login successful',

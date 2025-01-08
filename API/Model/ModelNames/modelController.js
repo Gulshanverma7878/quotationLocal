@@ -521,7 +521,7 @@ exports.excel = async (req, res) => {
             }
 
             console.log('Processing item:', item);
-            const existingModel = await ModelNames.findOne({ where: { VC_Code: item.VC_Code } });
+            const existingModel = await ModelNames.findOne({ where: { VC_Code: item.VC_Code,color:item.color } });
 
             let model;
             if (existingModel) {
@@ -719,10 +719,23 @@ exports.GetNames = async (req, resp) => {
         }
         console.log("Cache miss");
         const data = await ModelNames.findAll({
-            attributes: ['id', 'ppl']
+            attributes: ['id', 'ppl','quantity']
         });
-        myCache.set("modelNamesGet", data);
-        resp.status(200).json(data);
+        const newData = data.reduce((acc, item) => {
+            const existing = acc.find(entry => entry.ppl === item.ppl);
+            if (existing) {
+              existing.quantity += item.quantity;
+            } else {
+              acc.push({
+                id: item.id,
+                ppl: item.ppl,
+                quantity: item.quantity
+              });
+            }
+            return acc;
+        }, []);
+        myCache.set("modelNamesGet", newData);
+        resp.status(200).json(newData);
     } catch (error) {
         resp.status(500).json({ error: 'Failed to retrieve model names' });
     }

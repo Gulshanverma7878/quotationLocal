@@ -37,10 +37,10 @@ QuotationModel.init({
         type: DataTypes.JSON,
         allowNull: true,
     },
-    insurance: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-    },
+    // insurance: {
+    //     type: DataTypes.STRING(100),
+    //     allowNull: true,
+    // },
     price: {
         type: DataTypes.STRING(100),
         allowNull: true,
@@ -90,7 +90,7 @@ QuotationModel.init({
     //     allowNull: true,
     // },
     HPN: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.JSON,
         allowNull: true,
     },
     insurance_by:{
@@ -105,32 +105,32 @@ QuotationModel.init({
         type: DataTypes.BIGINT,
         allowNull: true
     },
-    key_replacement:{
-        type: DataTypes.STRING(100),
-        allowNull: true
-    },
-    engine_protection:{
-        type: DataTypes.BIGINT,
-        allowNull: true
-    },
-    RTI:{
-        type: DataTypes.BIGINT,
-    },
-    tyreAndOthers: {
-        type: DataTypes.BIGINT,
-        allowNull: true
-    },
-    consumable:{
-        type: DataTypes.BIGINT,
-        allowNull: true
-    },
-    personal_beloging:{
-        type:DataTypes.BIGINT,
-    },
-    bettery_protection:{
-        type:DataTypes.BIGINT,
+    // // // // // key_replacement:{
+    // // // // //     type: DataTypes.STRING(100),
+    // // // // //     allowNull: true
+    // // // // // },
+    // // // // // engine_protection:{
+    // // // // //     type: DataTypes.BIGINT,
+    // // // // //     allowNull: true
+    // // // // // },
+    // // // // RTI:{
+    // // // //     type: DataTypes.BIGINT,
+    // // // // },
+    // // // tyreAndOthers: {
+    // // //     type: DataTypes.BIGINT,
+    // // //     allowNull: true
+    // // // },
+    // // consumable:{
+    // //     type: DataTypes.BIGINT,
+    // //     allowNull: true
+    // // },
+    // personal_beloging:{
+    //     type:DataTypes.BIGINT,
+    // },
+    // bettery_protection:{
+    //     type:DataTypes.BIGINT,
 
-    },
+    // },
     fastag:{
         type:DataTypes.BIGINT,
     },
@@ -153,7 +153,7 @@ QuotationModel.init({
         onUpdate: 'CASCADE'
     },
     status: {
-        type:DataTypes.ENUM('Pending','Purchased', 'Purchased from Other Dealer', 'Purchase Another Company Vehicle','Not Interested'),
+        type:DataTypes.ENUM('Pending','Approved','Rejected'),
         allowNull:true,
         defaultValue:'Pending',
     },

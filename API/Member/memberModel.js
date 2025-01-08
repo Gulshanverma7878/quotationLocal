@@ -34,6 +34,10 @@ Member.init({
         allowNull: false,
         defaultValue: true,
     },
+    role:{
+      type:DataTypes.STRING(100),
+      allowNull:true,
+    }
 },
 {
     sequelize,
