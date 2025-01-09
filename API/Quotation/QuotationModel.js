@@ -90,7 +90,7 @@ QuotationModel.init({
     //     allowNull: true,
     // },
     HPN: {
-        type: DataTypes.JSON,
+        type: DataTypes.STRING(300),
         allowNull: true,
     },
     insurance_by:{

@@ -42,9 +42,6 @@ exports.get = async (req, resp) => {
             if (typeof item.insurances === 'string') {
                 item.insurances = JSON.parse(item.insurances);
             }
-            if (typeof item.HPN === 'string') {
-                item.HPN = JSON.parse(item.HPN);
-            }
         });
 
         return resp.status(200).json({
