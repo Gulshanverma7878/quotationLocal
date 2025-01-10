@@ -38,10 +38,6 @@ Modelname.init({
     type:DataTypes.BIGINT,
     allowNull:true
   },
-  RTO_Normal: {
-    type: DataTypes.BIGINT,
-    allowNull: true
-  },
   status: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
@@ -83,18 +79,26 @@ Modelname.init({
     type: DataTypes.STRING(100),
     allowNull: true
   },
+  RTO_Normal: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
   RTO_Normal_scrap: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.STRING(100),
     allowNull: true
   },
   RT_BH:{
-    type:DataTypes.BIGINT,
+    type:DataTypes.STRING(100),
     allowNull:true
   },
   RT_TRC:{
-    type:DataTypes.BIGINT,
+    type:DataTypes.STRING(100),
     allowNull:true
   },
+  scrap_benifit:{
+    type:DataTypes.STRING(100),
+    allowNull:true
+  }
   // insurance:{
   //   type:DataTypes.BIGINT,
   //   allowNull:true
