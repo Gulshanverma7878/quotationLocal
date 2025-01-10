@@ -752,7 +752,18 @@ exports.searchModel = async (req, res) => {
             },
             attributes: ['id', 'ppl', 'VC_Code', 'variant', ['fuel_type', 'fuel'],'color']
         });
-        console.log(modelname);
+        await Promise.all(
+            modelname.map(async (item) => {
+                const quantity = await ModelNames.count({
+                    where: {
+                        variant: item.variant,
+                        color: item.color
+                    }
+                });
+                item.dataValues.quantity = quantity;
+            })
+        );
+        console.log("Done");
         res.status(200).json(modelname);
     } catch (error) {
         console.error('Error retrieving model name:', error);
