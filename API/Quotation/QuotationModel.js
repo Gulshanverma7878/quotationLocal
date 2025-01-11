@@ -13,6 +13,10 @@ QuotationModel.init({
         type: DataTypes.STRING(100),
         allowNull: true,
     },
+    Ex_Showroom_Price: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+    },
     modelprice:{
         type:DataTypes.BIGINT,
         allowNull:true,
@@ -69,6 +73,35 @@ QuotationModel.init({
         type: DataTypes.BIGINT,
         allowNull: true,
     },
+    RTO_Normal: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+    },
+    RTO_Normal_scrap: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+    },
+    RTO_BH:{
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    RTO_TRC:{
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    TCS_price: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+    },
+    additional:{
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    billing_price:{
+        type: DataTypes.BIGINT,
+        allowNull: true
+    },
+
     insurances: {
         type: DataTypes.JSON,
         allowNull: true,
@@ -160,6 +193,10 @@ QuotationModel.init({
     QuotationType:{
         type:DataTypes.STRING(200),
         allowNull:true,
+    },
+    finalDealAmount:{
+        type:DataTypes.BIGINT,
+        allowNull:true
     }
 },{
 

@@ -37,6 +37,10 @@ Member.init({
     role:{
       type:DataTypes.STRING(100),
       allowNull:true,
+    },
+    profile:{
+      type:DataTypes.STRING(100),
+      allowNull:true,
     }
 },
 {

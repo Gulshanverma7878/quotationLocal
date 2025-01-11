@@ -3,10 +3,26 @@ const OTP = require('./otpModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
+const path = require('path');
+const fs = require('fs');
+
+const uploadPath = path.join(__dirname+'/../../', 'uploads');
+
 
 exports.createMember = async (req, res) => {
     try {
         const { name, email, password, mobile_no } = req.body;
+        const file = req.files.file;
+
+      
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+
+        const filePath = path.join(uploadPath, file.name);
+        await file.mv(filePath);
+        req.body.profile="/uploads/"+file.name;
+
         const modelname = await MemberModel.create(req.body);
         res.status(200).json(modelname);
     } catch (error) {
@@ -64,7 +80,7 @@ exports.loginMember = async (req, res) => {
             where: {
                 mobile_no
             },
-            attributes: ['id', 'name', 'email', 'mobile_no', 'status', 'password']
+            attributes: ['id', 'name', 'email', 'mobile_no', 'status', 'password','profile']
         });
         console.log(user);
         if (!user.status === true) {
