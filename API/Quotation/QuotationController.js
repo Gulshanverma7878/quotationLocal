@@ -14,11 +14,15 @@ exports.Create = async (req, resp) => {
                 console.log('Invalid JSON string in accessories:', error.message);
             }
         }
+
+        if(req.body.QuotationType=="general"){
+            req.body.status="Active";
+        }
         const addQuotation = await QuotationModel.create(req.body);
         if (addQuotation) {
             return resp.status(200).json(req.body);
         } else {
-            return resp.status(500).json("not create ")
+            return resp.status(400).json("form data  Formate is not valid  ")
         }
     } catch (error) {
         return resp.status(500).json(error);
@@ -60,16 +64,15 @@ exports.get = async (req, resp) => {
 exports.deleteQuotation = async (req, resp) => {
     try {
         const id = req.params.id;
-        console.log(id);
         const delQuotation = await QuotationModel.destroy({
             where: {
                 id
             }
         });
-        if (delQuotation) {
+        if (delQuotation == 1) {
             return resp.status(200).json("delete success");
         } else {
-            return resp.status(400).json("not delete");
+            return resp.status(400).json("not found");
         }
     } catch (error) {
         return resp.status(500).json(error);

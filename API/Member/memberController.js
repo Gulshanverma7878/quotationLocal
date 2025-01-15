@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
+const NodeCache = require('node-cache');
+const MemberCache = new NodeCache({ stdTTL: 600, checkperiod: 600 });
 
 const uploadPath = path.join(__dirname+'/../../', 'uploads');
 
@@ -35,10 +37,21 @@ exports.createMember = async (req, res) => {
 exports.getById = async (req, res) => {
     try {
         const { id } = req.params;
-        const member = await MemberModel.findByPk(id);
+        const cacheKey = `member_id${id}`;
+        const cachedMember = MemberCache.get(cacheKey);
+        if (cachedMember) {
+            console.log("Cache hit");
+            return res.status(200).json(cachedMember);
+        }
+        const member = await MemberModel.findByPk(id, {
+            attributes: { exclude: ['password'] },
+            raw: true
+        });
         if (!member) {
             return res.status(404).json({ error: 'Member not found' });
         }
+        console.log("Cache miss");
+        MemberCache.set(cacheKey, member);
         res.status(200).json(member);
     } catch (error) {
         console.error('Error retrieving member:', error);
@@ -52,6 +65,14 @@ exports.getAllMembers = async (req, res) => {
         const { page = 1, limit = 10 } = req.query; // Default pagination values
         const offset = (page - 1) * limit;
 
+        const cacheKey = `all_members_page${page}_limit${limit}`;
+        const cachedMembers = MemberCache.get(cacheKey);
+        if (cachedMembers) {
+            console.log("Cache hit");
+            return res.status(200).json(cachedMembers);
+        }
+
+        console.log("Cache miss");
         const members = await MemberModel.findAndCountAll({
             attributes: { exclude: ['password'] },
             raw: false,
@@ -59,12 +80,19 @@ exports.getAllMembers = async (req, res) => {
             offset,
         });
 
+
         res.status(200).json({
             totalItems: members.count,
             totalPages: Math.ceil(members.count / limit),
             currentPage: page,
             data: members.rows
         });
+
+        data={ totalItems: members.count,
+            totalPages: Math.ceil(members.count / limit),
+            currentPage: page,
+            data: members.rows}
+        MemberCache.set(cacheKey, data);
     } catch (error) {
         console.error('Error retrieving members:', error);
         res.status(500).json({ error: 'Failed to retrieve members' });
@@ -107,6 +135,39 @@ exports.loginMember = async (req, res) => {
         res.status(500).json({ error: 'Failed to login' });
     }
 }
+
+
+exports.updateMember = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const member = await MemberModel.findByPk(id);
+        if (!member) {
+            return res.status(404).json({ error: 'Member not found' });
+        }
+        const updatedMember = await member.update(req.body);
+        res.status(200).json(updatedMember);
+    } catch (error) {
+        console.error('Error updating member:', error);
+        res.status(500).json({ error: 'Failed to update member' });
+    }
+}
+
+exports.deleteMember = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const member = await MemberModel.findByPk(id);
+        if (!member) {
+            return res.status(404).json({ error: 'Member not found' });
+        }
+        await member.destroy();
+        MemberCache.del(`member_id${id}`);
+        res.status(200).json({ message: 'Member deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting member:', error);
+        res.status(500).json({ error: 'Failed to delete member' });
+    }
+}
+
 
 exports.otp = async (req, resp) => {
     try {
